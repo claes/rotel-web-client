@@ -1,4 +1,4 @@
-<html>
+	<html>
 <head>
  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script> 
  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css">
@@ -6,10 +6,6 @@
 </head>
 
 <body>
-{"P":"/dev/ttyUSB0","Data":[{"D":"cd!","Id":"234"}]}
-{"P":"/dev/ttyUSB0","Data":[{"D":"coax1!","Id":"1"}]}
-{"P":"/dev/ttyUSB0","Data":[{"D":"tone_on!"}]}
-sendjson {"P":"/dev/ttyUSB0","Data":[{"D":"bass_000!"}]}
 
 
 
@@ -24,112 +20,158 @@ sendjson {"P":"/dev/ttyUSB0","Data":[{"D":"bass_000!"}]}
 </fieldset>
 
 
+<fieldset>
+<div data-role="fieldcontain">
+<label for="mute-flipswitch">Mute:</label>
+<select id="mute-flipswitch" data-role="flipswitch">
+<option value="off">Off</option>
+<option value="on">On</option>
+</select>
+</div>
+</fieldset>
+
+
+<label>
+    <label for="volume-slider">Volume:</label>
+    <input name="volume-slider" id="volume-slider" data-highlight="true" min="0" max="100" value="10" type="range">
+</label> 
 <script type="text/javascript">
 
+var RotelState = function() {
+
+	this.volume = null;
+	this.power = null;
+	this.mute = null;
+	this.inputSource = null;
+	this.tone = null;
+	this.bass = null;
+	this.treble = null;
+	this.balance = null;
+	this.play_status = null;
+	this.freq = null;
+
+
+	this.stateChanged = function() {
+		console.log(	"volume: " + this.volume + 
+				", power: " + this.power + 
+				", mute: " + this.mute + 
+				", inputSource: " + this.inputSource + 
+				", tone: " + this.tone + 
+				", bass: " + this.bass + 
+				", treble: " + this.treble + 
+				", balance: " + this.balance +
+				", freq: " + this.freq + 
+				", play_status: " + this.play_status)
+		
+		$("#power-flipswitch").val(this.power).flipswitch('refresh');
+		$("#mute-flipswitch").val(this.mute).flipswitch('refresh');
+		$("#volume-slider").val(this.mute).flipswitch('refresh');
+	}
+}
+
 var RotelClient = function() {
-	this.foo = "foo";
+	var rotelState = new RotelState();
+	var self = this;
 	this.webSocket = new WebSocket('ws://localhost:8989/ws');
 	this.webSocket.onopen = function() {
-		//webSocket.send('open /dev/ttyUSB0 115200');
-	}
+		self.webSocket.send('open /dev/ttyUSB0 115200');
+	};
 
 	this.webSocket.onerror = function(error) {
 		console.log("error: " + error);	
 	};
 
 	this.webSocket.onmessage = function(e) {
-		console.log("server: " + e.data);
-		var response = JSON.parse(e.data).D;
+		parseEvent(e, rotelState);
+	};
+
+	this.toggleMuteEvent = function() { return this.createActionEvent('mute'); }
+	this.muteOnEvent = function() { return createActionEvent('mute_on'); }
+	var muteOffEvent = function() { return createActionEvent('mute_off'); }
+	var togglePowerEvent = function() { return createActionEvent('power_toggle'); }
+	var powerOnEvent = function() { return createActionEvent('power_on'); }
+	var powerOffEvent = function() { return createActionEvent('power_off'); }
+	var volumeUpEvent = function() { return createActionEvent('volume_up'); }
+	var volumeDownEvent = function() { return createActionEvent('volume_down'); }
+	var getCurrentPowerEvent = function() { return createActionEvent('get_current_power'); }
+	var getCurrentSourceEvent = function() { return createActionEvent('get_current_source'); }
+	var getToneEvent = function() { return createActionEvent('get_tone'); }
+	var getBassEvent = function() { return createActionEvent('get_bass'); }
+	var getTrebleEvent = function() { return createActionEvent('get_treble'); }
+	var getBalanceEvent = function() { return createActionEvent('get_balance'); }
+	var getCurrentFreqEvent = function() { return createActionEvent('get_current_freq'); }
+	var getVolumeEvent = function() { return createActionEvent('get_volume'); }
+
+	this.createActionEvent = function(action) {
+		return 'sendjson {"P":"/dev/ttyUSB0","Data":[{"D":"'+action+'!"}]}';
+	};
+
+	var parseEvent = function(evt, rotelState) {
+		console.log("server: " + evt.data);
+		var response = JSON.parse(evt.data);
 		console.log("response:" + response);
-		if (response) {
-			typeAndValue = /([a-z]+)\=([a-z0-9]+)\!/gi.exec(response);
+		if (response && response.D) {
+			typeAndValue = /([a-z]+)\=([a-z0-9]+)\!/gi.exec(response.D);
 			console.log("typeAndValue: " + typeAndValue);
 			if (typeAndValue) {
 				var type = typeAndValue[1];
 				var value = typeAndValue[2];
 				switch (type) {
 					case "volume":
-						this.volume = value;
-						console.log("volume: " + this.volume);
+						rotelState.volume = value;
 						break;
 					case "power":
-						this.power = value;
-						console.log("power: " + this.power);
+						rotelState.power = value;
 						break;
 					case "mute":
-						this.mute = value;
-						console.log("mute: " + this.mute);
+						rotelState.mute = value;
 						break;
 					case "source":
-						this.inputSource = value;
-						console.log("inputSource: " + this.inputSource);
+						rotelState.inputSource = value;
 						break;
 					case "tone":
-						this.tone = value;
-						console.log("tone: " + this.tone);
+						rotelState.tone = value;
 						break;
 					case "bass":
-						this.bass = value;
-						console.log("bass: " + this.bass);
+						rotelState.bass = value;
 						break;
 					case "treble":
-						this.treble = value;
-						console.log("treble: " + this.treble);
+						rotelState.treble = value;
 						break;
 					case "balance":
-						this.balance = value;
-						console.log("balance: " + this.balance);
+						rotelState.balance = value;
+						break;
+					case "freq":
+						rotelState.freq = value;
+						break;
+					case "play_status":
+						rotelState.play_status = value;
 						break;
 				}
+				rotelState.stateChanged();
 			}
 		}
+	}
 
-	};
+	var discard = function() {
+		webSocket.close();
+	}
+
 };
 
-RotelClient.prototype.discard = function() {
-	this.webSocket.close();
-}
- 
-RotelClient.prototype.muteOn = function() {
-
-	this.webSocket.send('sendjson {"P":"/dev/ttyUSB0","Data":[{"D":"mute_on!"}]}');
-}
-
-RotelClient.prototype.muteOff = function() {
-	this.webSocket.send('sendjson {"P":"/dev/ttyUSB0","Data":[{"D":"mute_off!"}]}');
-}
 
 $(document).ready(function(){
 	var rotelClient = new RotelClient();
 
-    	$("#power-flipswitch").on("change", function() {rotelClient.muteOn()} );
+    	$("#mute-flipswitch").on("click", function() {
+		var a = rotelClient.toggleMuteEvent();
+		console.log("Clicked! : " + a);
+		rotelClient.webSocket.send(a);
+	} );
 
 });
 
 $(window).on('beforeunload', function() {rotelClient.discard();} );
-
-
-/*
-	var connection = 
-
-	$(window).on('beforeunload', function() {connection.close();} );
-
-	connection.onopen = function() {
-		connection.send('open /dev/ttyUSB0 115200');
-		connection.send('sendjson {"P":"/dev/ttyUSB0","Data":[{"D":"power_on!"}]}')
-	};
-
-	connection.onerror = function(error) {
-		console.log("error: " + error);	
-	};
-
-	connection.onmessage = function(e) {
-		console.log("server: " + e.data);
-	};
-
-
-*/
 
 
 
