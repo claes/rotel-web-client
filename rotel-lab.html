@@ -1,4 +1,4 @@
-	<html>
+<html>
 <head>
  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script> 
  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css">
@@ -6,8 +6,6 @@
 </head>
 
 <body>
-
-
 
 <fieldset>
 <div data-role="fieldcontain">
@@ -19,7 +17,6 @@
 </div>
 </fieldset>
 
-
 <fieldset>
 <div data-role="fieldcontain">
 <label for="mute-flipswitch">Mute:</label>
@@ -30,13 +27,56 @@
 </div>
 </fieldset>
 
+<fieldset>
+<div data-role="fieldcontain">
+<label for="tone-flipswitch">Tone:</label>
+<select id="tone-flipswitch" data-role="flipswitch">
+<option value="off">Off</option>
+<option value="on">On</option>
+</select>
+</div>
+</fieldset>
+
 
 <label>
     <label for="volume-slider">Volume:</label>
-    <input name="volume-slider" id="volume-slider" data-highlight="true" min="0" max="100" value="10" type="range">
+    <input name="volume-slider" id="volume-slider" data-highlight="true" min="0" max="95" value="10" type="range">
 </label> 
-<script type="text/javascript">
 
+
+<label for="source" class="select">Source:</label>
+<select name="source" id="source">
+<option value="aux1">Aux 1</option>
+<option value="aux2">Aux 2</option>
+<option value="coax1">Coax 1</option>
+<option value="coax2">Coax 2</option>
+<option value="opt1">Optical 1</option>
+<option value="opt2">Optical 2</option>
+<option value="tuner">Tuner</option>
+<option value="phono">Phono</option>
+<option value="cd">CD</option>
+<option value="usb">USB</option>
+</select></label> 
+
+
+<label>
+    <label for="treble-slider">Treble:</label>
+    <input name="treble-slider" id="treble-slider" data-highlight="true" min="-10" max="10" value="0" type="range">
+</label> 
+
+<label>
+    <label for="bass-slider">Bass:</label>
+    <input name="bass-slider" id="bass-slider" data-highlight="true" min="-10" max="10" value="0" type="range">
+</label> 
+
+<label>
+    <label for="balance-slider">Balance:</label>
+    <input name="balance-slider" id="balance-slider" data-highlight="true" min="-15" max="15" value="0" type="range">
+</label> 
+
+
+
+<script type="text/javascript">
 var RotelState = function() {
 
 	this.volume = null;
@@ -65,7 +105,11 @@ var RotelState = function() {
 		
 		$("#power-flipswitch").val(this.power).flipswitch('refresh');
 		$("#mute-flipswitch").val(this.mute).flipswitch('refresh');
-		$("#volume-slider").val(this.mute).flipswitch('refresh');
+		$("#volume-slider").val(this.volume).slider('refresh');
+		$("#source").val(this.inputSource).selectmenu('refresh');
+		//$("#bass-slider").val(Number(this.bass)).slider('refresh');
+		$("#treble-slider").val(Number(this.treble)).slider('refresh');
+
 	}
 }
 
@@ -85,22 +129,43 @@ var RotelClient = function() {
 		parseEvent(e, rotelState);
 	};
 
+	this.sourceCdEvent =  function() { return this.createActionEvent('cd'); }
+	this.sourceUsbEvent =  function() { return this.createActionEvent('usb'); }
+	this.sourceCoax1Event =  function() { return this.createActionEvent('coax1'); }
+	this.sourceCoax2Event =  function() { return this.createActionEvent('coax2'); }
+	this.sourceOpt1Event =  function() { return this.createActionEvent('opt1'); }
+	this.sourceOpt2Event =  function() { return this.createActionEvent('opt2'); }
+	this.sourceAux1Event =  function() { return this.createActionEvent('aux1'); }
+	this.sourceAux2Event =  function() { return this.createActionEvent('aux2'); }
+	this.sourceTunerEvent =  function() { return this.createActionEvent('tuner'); }
+	this.sourcePhonoEvent =  function() { return this.createActionEvent('phono'); }
+
 	this.toggleMuteEvent = function() { return this.createActionEvent('mute'); }
-	this.muteOnEvent = function() { return createActionEvent('mute_on'); }
-	var muteOffEvent = function() { return createActionEvent('mute_off'); }
-	var togglePowerEvent = function() { return createActionEvent('power_toggle'); }
-	var powerOnEvent = function() { return createActionEvent('power_on'); }
-	var powerOffEvent = function() { return createActionEvent('power_off'); }
-	var volumeUpEvent = function() { return createActionEvent('volume_up'); }
-	var volumeDownEvent = function() { return createActionEvent('volume_down'); }
-	var getCurrentPowerEvent = function() { return createActionEvent('get_current_power'); }
-	var getCurrentSourceEvent = function() { return createActionEvent('get_current_source'); }
-	var getToneEvent = function() { return createActionEvent('get_tone'); }
-	var getBassEvent = function() { return createActionEvent('get_bass'); }
-	var getTrebleEvent = function() { return createActionEvent('get_treble'); }
-	var getBalanceEvent = function() { return createActionEvent('get_balance'); }
-	var getCurrentFreqEvent = function() { return createActionEvent('get_current_freq'); }
-	var getVolumeEvent = function() { return createActionEvent('get_volume'); }
+	this.muteOnEvent = function() { return this.createActionEvent('mute_on'); }
+	this.muteOffEvent = function() { return this.createActionEvent('mute_off'); }
+	this.muteSetEvent = function(v) { return this.createActionEvent('mute_' + v); }
+	this.toneOnEvent = function() { return this.createActionEvent('tone_on'); }
+	this.toneOffEvent = function() { return this.createActionEvent('tone_off'); }
+	this.toneSetEvent = function(v) { return this.createActionEvent('tone_' + v); }
+	this.togglePowerEvent = function() { return this.createActionEvent('power_toggle'); }
+	this.powerOnEvent = function() { return this.createActionEvent('power_on'); }
+	this.powerOffEvent = function() { return this.createActionEvent('power_off'); }
+	this.powerSetEvent = function(v) { return this.createActionEvent('power_' + v); }
+	this.volumeSetEvent = function(v) { return this.createActionEvent('volume_' + v); }
+	this.bassSetEvent = function(v) { return this.createActionEvent('bass_' + v); }
+	this.bassUpEvent = function() { return this.createActionEvent('bass_up'); }
+	this.bassDownEvent = function() { return this.createActionEvent('bass_down'); }
+	this.trebleSetEvent = function(v) { return this.createActionEvent('treble_' + v); }
+	this.balanceSetEvent = function(v) { return this.createActionEvent('balance_' + v); }
+	this.volumeDownEvent = function() { return this.createActionEvent('volume_down'); }
+	this.getCurrentPowerEvent = function() { return this.createActionEvent('get_current_power'); }
+	this.getCurrentSourceEvent = function() { return this.createActionEvent('get_current_source'); }
+	this.getToneEvent = function() { return this.createActionEvent('get_tone'); }
+	this.getBassEvent = function() { return this.createActionEvent('get_bass'); }
+	this.getTrebleEvent = function() { return this.createActionEvent('get_treble'); }
+	this.getBalanceEvent = function() { return this.createActionEvent('get_balance'); }
+	this.getCurrentFreqEvent = function() { return this.createActionEvent('get_current_freq'); }
+	this.getVolumeEvent = function() { return this.createActionEvent('get_volume'); }
 
 	this.createActionEvent = function(action) {
 		return 'sendjson {"P":"/dev/ttyUSB0","Data":[{"D":"'+action+'!"}]}';
@@ -162,13 +227,49 @@ var RotelClient = function() {
 
 $(document).ready(function(){
 	var rotelClient = new RotelClient();
-
-    	$("#mute-flipswitch").on("click", function() {
-		var a = rotelClient.toggleMuteEvent();
-		console.log("Clicked! : " + a);
+source
+    	$("#source").on("change", function() {
+		var a = rotelClient.createActionEvent($("#source").val());
 		rotelClient.webSocket.send(a);
 	} );
 
+    	$("#mute-flipswitch").on("change", function() {
+		var a = rotelClient.muteSetEvent($("#mute-flipswitch").val());
+		rotelClient.webSocket.send(a);
+	} );
+
+    	$("#power-flipswitch").on("change", function() {
+		var a = rotelClient.powerSetEvent($("#power-flipswitch").val());
+		rotelClient.webSocket.send(a);
+	} );
+
+    	$("#tone-flipswitch").on("change", function() {
+		var a = rotelClient.toneSetEvent($("#tone-flipswitch").val());
+		rotelClient.webSocket.send(a);
+	} );
+
+    	$("#volume-slider").on("change", function() {
+		var a = rotelClient.volumeSetEvent($("#volume-slider").val());
+		rotelClient.webSocket.send(a);
+	} );
+
+    	$("#bass-slider").on("change", function() {
+		var v = $("#bass-slider").val();
+		var a;
+		if (v < 0) {
+			a = rotelClient.bassSetEvent(v + '');
+		} else if (v == 0) {
+			a = rotelClient.bassSetEvent('000');
+		} else if (v > 0) {
+			a = rotelClient.bassSetEvent('+' + v);
+		}
+		a = rotelClient.bassUpEvent();
+		rotelClient.webSocket.send(a);
+	} );
+    	$("#treble-slider").on("change", function() {
+		var a = rotelClient.volumeSetEvent($("#treble-slider").val());
+		rotelClient.webSocket.send(a);
+	} );
 });
 
 $(window).on('beforeunload', function() {rotelClient.discard();} );
