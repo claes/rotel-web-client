@@ -11,6 +11,8 @@ var RotelClient = function() {
 	this.balance = null;
 	this.play_status = null;
 	this.freq = null;
+	this.display1 = null;
+	this.display2 = null;
 	
 	this.stateChanged = function() {
 		console.log(	"volume: " + this.volume + 
@@ -22,7 +24,9 @@ var RotelClient = function() {
 				", treble: " + this.treble + 
 				", balance: " + this.balance +
 				", freq: " + this.freq + 
-				", play_status: " + this.play_status)
+				", play_status: " + this.play_status +
+				", display1: '" + this.display1 + "'" +  
+				", display2: '" + this.display2  + "'" )
 
 		this.detachEventHandlers();		
 		$("#power-flipswitch").val(this.power).flipswitch('refresh');
@@ -31,6 +35,8 @@ var RotelClient = function() {
 		$("#source").val(this.inputSource).selectmenu('refresh');
 		$("#bass-slider").val(Number(this.bass)).slider('refresh');
 		$("#treble-slider").val(Number(this.treble)).slider('refresh');
+		$("#lcd-display").text(this.display1 + "\n" + this.display2);
+
 		this.attachEventHandlers();
 	}
 
@@ -40,6 +46,7 @@ var RotelClient = function() {
 		self.webSocket.send(self.getCurrentSourceEvent());
 		self.webSocket.send(self.getToneEvent());
 		self.webSocket.send(self.getVolumeEvent());
+		self.webSocket.send(self.getDisplayEvent());
 	}
 
 	this.detachEventHandlers = function() {
@@ -155,21 +162,36 @@ var RotelClient = function() {
 	this.getBalanceEvent = function() { return this.createActionEvent('get_balance'); }
 	this.getCurrentFreqEvent = function() { return this.createActionEvent('get_current_freq'); }
 	this.getVolumeEvent = function() { return this.createActionEvent('get_volume'); }
+	this.getDisplayEvent = function() { return this.createActionEvent('get_display'); }
 
 	this.createActionEvent = function(action) {
 		return 'sendjson {"P":"/dev/ttyUSB0","Data":[{"D":"'+action+'!"}]}';
 	};
 
 	var incompleteEvent = null;
+	var remainingDisplayCharCount = null;
 
 	var parseEvent = function(evt) {
 		console.log("server: " + evt.data);
 		var response = JSON.parse(evt.data);
 		console.log("response:" + response);
 		if (response && response.D) {
+
+			//most commands end with !
 			var responses = response.D.split("!");
 			if (responses) {
 				for (var i = 0; i < responses.length; i++)  {
+					console.log("response " + i + ": "  + responses[i]);
+
+					if (self.remainingDisplayCharCount) {
+						console.log("remainingDisplayCharCount");
+						self.display2 = responses[i];
+						self.remainingDisplayCharCount = null;
+						self.stateChanged();
+						continue;
+					} else {
+						console.log("not remainingDisplayCharCount");
+					}
 					typeAndValue = responses[i].split("=");
 					console.log("typeAndValue: " + typeAndValue);
 					if (typeAndValue) {
@@ -188,6 +210,15 @@ var RotelClient = function() {
 						if (value) {
 							incompleteEvent = null;
 							switch (type) {
+								case "display": 
+									var displayCharCount = Number(value.substring(0,3));
+									self.display1 = value.substring(4);
+									self.remainingDisplayCharCount = 
+										displayCharCount - self.display1.length;
+									self.remainingDisplayCharCount = 
+										(self.remainingDisplayCharCount > 0) ? 
+											self.remainingDisplayCharCount : null;
+									break;
 								case "volume":
 									self.volume = value;
 									break;
@@ -219,7 +250,9 @@ var RotelClient = function() {
 									self.play_status = value;
 									break;
 							}
-							self.stateChanged();
+							if (self.remainingDisplayCharCount == null) {
+								self.stateChanged();
+							}
 						}
 					}
 				}
