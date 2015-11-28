@@ -64,7 +64,11 @@ var RotelClient = function() {
 		} );
 
 	    	$("#power-flipswitch").on("change", function() {
-			var a = self.powerSetEvent($("#power-flipswitch").val());
+			var c = $("#power-flipswitch").val();
+			if (c == "standby") {
+				c = "off";
+			}
+			var a = self.powerSetEvent(c);
 			self.webSocket.send(a);
 		} );
 
@@ -98,7 +102,9 @@ var RotelClient = function() {
 	}
 
 
-	this.webSocket = new WebSocket('ws://localhost:8989/ws');
+	this.webSocket = new ReconnectingWebSocket('ws://localhost:8989/ws');
+	this.webSocket.timeoutInterval = 1000;
+	this.webSocket.maxReconnectInterval = 8000;
 	this.webSocket.onopen = function() {
 		self.webSocket.send('open /dev/ttyUSB0 115200');
 		self.initializeRotelState();
@@ -154,6 +160,8 @@ var RotelClient = function() {
 		return 'sendjson {"P":"/dev/ttyUSB0","Data":[{"D":"'+action+'!"}]}';
 	};
 
+	var incompleteEvent = null;
+
 	var parseEvent = function(evt) {
 		console.log("server: " + evt.data);
 		var response = JSON.parse(evt.data);
@@ -167,39 +175,52 @@ var RotelClient = function() {
 					if (typeAndValue) {
 						var type = typeAndValue[0];
 						var value = typeAndValue[1];
-						switch (type) {
-							case "volume":
-								self.volume = value;
-								break;
-							case "power":
-								self.power = value;
-								break;
-							case "mute":
-								self.mute = value;
-								break;
-							case "source":
-								self.inputSource = value;
-								break;
-							case "tone":
-								self.tone = value;
-								break;
-							case "bass":
-								self.bass = value;
-								break;
-							case "treble":
-								self.treble = value;
-								break;
-							case "balance":
-								self.balance = value;
-								break;
-							case "freq":
-								self.freq = value;
-								break;
-							case "play_status":
-								self.play_status = value;
-								break;
+						//since Rotel's response might be split in several events
+						//by serial port JSON
+						// we must work around it below
+						if (incompleteEvent) { 
+							type = incompleteEvent + type;
+							incompleteEvent = null;
 						}
-						self.stateChanged();
+						if (value == null) {
+							incompleteEvent = type;
+						}
+						if (value) {
+							incompleteEvent = null;
+							switch (type) {
+								case "volume":
+									self.volume = value;
+									break;
+								case "power":
+									self.power = value;
+									break;
+								case "mute":
+									self.mute = value;
+									break;
+								case "source":
+									self.inputSource = value;
+									break;
+								case "tone":
+									self.tone = value;
+									break;
+								case "bass":
+									self.bass = value;
+									break;
+								case "treble":
+									self.treble = value;
+									break;
+								case "balance":
+									self.balance = value;
+									break;
+								case "freq":
+									self.freq = value;
+									break;
+								case "play_status":
+									self.play_status = value;
+									break;
+							}
+							self.stateChanged();
+						}
 					}
 				}
 			}
