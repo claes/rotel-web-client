@@ -31,17 +31,23 @@ var RotelClient = function() {
 		this.detachEventHandlers();		
 		$("#power-flipswitch").val(this.power).flipswitch('refresh');
 		$("#mute-flipswitch").val(this.mute).flipswitch('refresh');
-		$("#tone-flipswitch").val(this.tone	).flipswitch('refresh');
+		$("#tone-flipswitch").val(this.tone).flipswitch('refresh');
 		$("#volume-slider").val(this.volume).slider('refresh');
 		$("#source").val(this.inputSource).selectmenu('refresh');
+
+		if ("off" == $("#tone-flipswitch").val()) {
+			$("#bass-slider").slider("disable");
+			$("#treble-slider").slider("disable");
+		} else {
+			$("#bass-slider").slider("enable");
+			$("#treble-slider").slider("enable");
+		}		
 		$("#bass-slider").val(Number(this.bass)).slider('refresh');
 		$("#treble-slider").val(Number(this.treble)).slider('refresh');
 		if (this.balance != null) {
 			$("#balance-slider").val(Number(this.balance.replace('L', '-').replace('R', ''))).slider('refresh');
 		}
 		$("#lcd-display").text(this.display1 + "\n" + this.display2);
-
-
 		this.attachEventHandlers();
 	}
 
@@ -247,21 +253,28 @@ var RotelClient = function() {
 						if (typeAndValue) {
 							var type = typeAndValue[0];
 							var value = typeAndValue[1];
-							//since Rotel's response might be split in several events
+							console.log("type: '" + type+"', value: '"+value+"'");
+	
+							// since Rotel's response might be split in several events
 							// by serial port JSON
 							// we must work around it below
-							if (incompleteEvent) { 
-								type = incompleteEvent + type;
-								incompleteEvent = null;
-							}
-							if (value == null) {
-								incompleteEvent = type;
-							}
+/*
+								if (incompleteEvent) { 
+
+									type = incompleteEvent + type;
+									console.log("incompleteEvent = "+incompleteEvent+" . type = " + type);
+									incompleteEvent = null;
+								}
+								if (value == null) {
+									incompleteEvent = type;
+								}*/
 							if (value) {
 								incompleteEvent = null;
 								switch (type) {
 									case "display": 
 										var displayCharCount = Number(value.substring(0,3));
+										console.log("displayCharCount: "+displayCharCount+"valueX:  " + value + "'");
+
 										self.display1 = value.substring(4);
 										self.remainingDisplayCharCount = 
 											displayCharCount - self.display1.length;
