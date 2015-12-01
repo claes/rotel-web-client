@@ -46,9 +46,10 @@ var RotelClient = function() {
 		if (this.balance != null) {
 			$("#balance-slider").val(Number(this.balance.replace('L', '-').replace('R', ''))).slider('refresh');
 		}
-		var display = "" + this.display1 + this.display2;
-		$("#lcd-display").text((display.slice(0,21) + "\n" + display.slice(21)));
-		//$("#lcd-display").text((this.display1 + "\n" + this.display2));
+		if (this.display1 != null && this.display2 != null) {
+			var display = "" + this.display1 + this.display2;
+			$("#lcd-display").text((display.slice(0,21) + "\n" + display.slice(21)));
+		}
 		this.attachEventHandlers();
 	}
 
@@ -253,9 +254,6 @@ var RotelClient = function() {
 						var displayIndex = response.indexOf("display=");
 						if (displayIndex > -1 ) {
 							var type = response.substring(displayIndex, displayIndex + 7)
-							//var displayCharCount = 
-							//	Number(response.substring(displayIndex + 9, displayIndex + 12))
-							//var value = response.substring(displayIndex + 12);
 							var value = response.substring(displayIndex + 8);
 						} else {
 							typeAndValue = response.split("=");
@@ -268,20 +266,6 @@ var RotelClient = function() {
 
 						console.log("type: '" + type+"', value: '"+value+"'");
 						if (type != null && value != null) {
-	
-							// since Rotel's response might be split in several events
-							// by serial port JSON
-							// we must work around it below
-/*
-								if (incompleteEvent) { 
-
-									type = incompleteEvent + type;
-									console.log("incompleteEvent = "+incompleteEvent+" . type = " + type);
-									incompleteEvent = null;
-								}
-								if (value == null) {
-									incompleteEvent = type;
-								}*/
 							if (value) {
 								incompleteEvent = null;
 								switch (type) {
