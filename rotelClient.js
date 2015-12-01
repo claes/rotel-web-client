@@ -34,7 +34,6 @@ var RotelClient = function() {
 		$("#tone-flipswitch").val(this.tone).flipswitch('refresh');
 		$("#volume-slider").val(this.volume).slider('refresh');
 		$("#source").val(this.inputSource).selectmenu('refresh');
-
 		if ("off" == $("#tone-flipswitch").val()) {
 			$("#bass-slider").slider("disable");
 			$("#treble-slider").slider("disable");
@@ -47,7 +46,9 @@ var RotelClient = function() {
 		if (this.balance != null) {
 			$("#balance-slider").val(Number(this.balance.replace('L', '-').replace('R', ''))).slider('refresh');
 		}
-		$("#lcd-display").text(this.display1 + "\n" + this.display2);
+		var display = "" + this.display1 + this.display2;
+		$("#lcd-display").text((display.slice(0,21) + "\n" + display.slice(21)));
+		//$("#lcd-display").text((this.display1 + "\n" + this.display2));
 		this.attachEventHandlers();
 	}
 
@@ -248,12 +249,25 @@ var RotelClient = function() {
 						}
 
 						console.log("response: " + response);
-						typeAndValue = response.split("=");
-						console.log("typeAndValue: " + typeAndValue);
-						if (typeAndValue) {
-							var type = typeAndValue[0];
-							var value = typeAndValue[1];
-							console.log("type: '" + type+"', value: '"+value+"'");
+
+						var displayIndex = response.indexOf("display=");
+						if (displayIndex > -1 ) {
+							var type = response.substring(displayIndex, displayIndex + 7)
+							//var displayCharCount = 
+							//	Number(response.substring(displayIndex + 9, displayIndex + 12))
+							//var value = response.substring(displayIndex + 12);
+							var value = response.substring(displayIndex + 8);
+						} else {
+							typeAndValue = response.split("=");
+							console.log("typeAndValue: " + typeAndValue);
+							if (typeAndValue) {
+								var type = typeAndValue[0];
+								var value = typeAndValue[1];
+							}
+						}
+
+						console.log("type: '" + type+"', value: '"+value+"'");
+						if (type != null && value != null) {
 	
 							// since Rotel's response might be split in several events
 							// by serial port JSON
