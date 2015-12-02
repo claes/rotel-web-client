@@ -1,17 +1,17 @@
 var RotelClient = function() {
 
-	var config = {
-		websocketUrl : 'ws://192.168.88.230:8989/ws',
-		aux1_label: 'External Bluetooth',
-		aux2_label: null,
-		coax1_label: null,
-		coax2_label: 'Volumio',
-		opt1_label: 'TV',
-		opt2_label: 'Chromecast',
-		tuner_label: null,
-		phono_label: null,
-		cd_label: null,
-		usb_label: 'Rotel Bluetooth'
+	var config = RotelConfig || {  //Adjust custom config in rotelConfig.js
+		websocketUrl : 'ws://localhost:8989/ws',
+		aux1_label: 'AUX1',
+		aux2_label: 'AUX2',
+		coax1_label: 'COAX1',
+		coax2_label: 'COAX2',
+		opt1_label: 'OPT1',
+		opt2_label: 'OPT2',
+		tuner_label: 'TUNER',
+		phono_label: 'PHONO',
+		cd_label: 'CD',
+		usb_label: 'USB'
 	};
 
 	var self = this;
