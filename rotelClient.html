@@ -1,29 +1,71 @@
 <html>
 <head>
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script> 
  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css">
  <script src="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js"></script> 
  <script src="rotelClient.js"></script> 
  <script src="reconnectingWebsocket.js"></script> 
+
+<style>
+input, label {
+    display: block;
+}
+.flipswitchrow
+{
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+.flipswitchcolumn
+{
+    display: table-cell;
+    padding-right: 10px;
+}
+.controlcontainer
+{
+    margin: 10px;
+}
+
+#lcd-display
+{
+    border: 2px solid;
+    padding: 6px;
+    margin-bottom: 10px;
+    font-family:monospace;
+    white-space:pre;
+    font-size: 150%;
+    text-align: center;
+}
+</style>
+
 </head>
 
 <body>
-
-<div id="lcd-display" style="font-family:monospace;white-space:pre;">
+<div data-role="page" id="home">
+<div class="controlcontainer">
+<div id="lcd-display" >
 </div>
 
-<fieldset>
-<div data-role="fieldcontain">
+<fieldset id="test" class="flipswitchrow">
+
+<div class="flipswitchcolumn">
 <label for="power-flipswitch">Power:</label>
 <select id="power-flipswitch" data-role="flipswitch">
 <option value="standby">Off</option>
 <option value="on">On</option>
 </select>
 </div>
-</fieldset>
 
-<fieldset>
-<div data-role="fieldcontain">
+<div class="flipswitchcolumn">
+<label for="tone-flipswitch">Tone:</label>
+<select id="tone-flipswitch" data-role="flipswitch">
+<option value="off">Off</option>
+<option value="on">On</option>
+</select>
+</div>
+
+<div class="flipswitchcolumn">
 <label for="mute-flipswitch">Mute:</label>
 <select id="mute-flipswitch" data-role="flipswitch">
 <option value="off">Off</option>
@@ -31,17 +73,6 @@
 </select>
 </div>
 </fieldset>
-
-<fieldset>
-<div data-role="fieldcontain">
-<label for="tone-flipswitch">Tone:</label>
-<select id="tone-flipswitch" data-role="flipswitch">
-<option value="off">Off</option>
-<option value="on">On</option>
-</select>
-</div>
-</fieldset>
-
 
 <label>
     <label for="volume-slider">Volume:</label>
@@ -78,14 +109,16 @@
     <label for="balance-slider">Balance:</label>
     <input name="balance-slider" id="balance-slider" data-highlight="true" min="-15" max="15" value="0" type="range">
 </label> 
-
+</div>
 <script type="text/javascript">
 $(document).ready(function(){
 	var rotelClient = new RotelClient();	
+	document.body.requestFullscreen();
 });
 
 $(window).on('beforeunload', function() {rotelClient.discard();} );
 </script>
+</div>
 </body>
 </html>
 

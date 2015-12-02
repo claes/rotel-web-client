@@ -1,4 +1,9 @@
 var RotelClient = function() {
+
+	var config = {
+		websocketUrl : 'ws://192.168.88.230:8989/ws'
+	};
+
 	var self = this;
 
 	this.volume = null;
@@ -147,7 +152,7 @@ var RotelClient = function() {
 
 	}
 
-	this.webSocket = new ReconnectingWebSocket('ws://localhost:8989/ws');
+	this.webSocket = new ReconnectingWebSocket(config.websocketUrl);
 	this.webSocket.timeoutInterval = 1000;
 	this.webSocket.maxReconnectInterval = 8000;
 	this.webSocket.onopen = function() {
