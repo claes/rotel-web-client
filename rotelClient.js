@@ -1,7 +1,17 @@
 var RotelClient = function() {
 
 	var config = {
-		websocketUrl : 'ws://192.168.88.230:8989/ws'
+		websocketUrl : 'ws://192.168.88.230:8989/ws',
+		aux1_label: 'External Bluetooth',
+		aux2_label: null,
+		coax1_label: null,
+		coax2_label: 'Volumio',
+		opt1_label: 'TV',
+		opt2_label: 'Chromecast',
+		tuner_label: null,
+		phono_label: null,
+		cd_label: null,
+		usb_label: 'Rotel Bluetooth'
 	};
 
 	var self = this;
@@ -68,6 +78,17 @@ var RotelClient = function() {
 		self.webSocket.send(self.getTrebleEvent());
 		self.webSocket.send(self.getBalanceEvent());
 		self.webSocket.send(self.getDisplayEvent());
+
+		config.aux1_label ? $("#aux1").text(config.aux1_label) : $("#aux1").remove();
+		config.aux2_label ? $("#aux2").text(config.aux2_label) : $("#aux2").remove();
+		config.coax1_label ? $("#coax1").text(config.coax1_label) : $("#coax1").remove();
+		config.coax2_label ? $("#coax2").text(config.coax2_label) : $("#coax2").remove();
+		config.opt1_label ? $("#opt1").text(config.opt1_label) : $("#opt1").remove();
+		config.opt2_label ? $("#opt2").text(config.opt2_label) : $("#opt2").remove();
+		config.tuner_label ? $("#tuner").text(tuner.coax1_label) : $("#tuner").remove();
+		config.phono_label ? $("#phono").text(config.phono_label) : $("#phono").remove();
+		config.cd_label ? $("#cd").text(config.cd_label) : $("#cd").remove();
+		config.usb_label ? $("#usb").text(config.usb_label) : $("#usb").remove();
 	}
 
 	this.detachEventHandlers = function() {
