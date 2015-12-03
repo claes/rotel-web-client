@@ -1,5 +1,6 @@
 var RotelConfig = {
 	websocketUrl : 'ws://192.168.88.230:8989/ws',
+	serialPortDevice: '/dev/ttyUSB0',
 	aux1_label: 'External Bluetooth',
 	aux2_label: null,
 	coax1_label: null,

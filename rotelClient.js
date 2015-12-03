@@ -2,6 +2,7 @@ var RotelClient = function() {
 
 	var config = RotelConfig || {  //Adjust custom config in rotelConfig.js
 		websocketUrl : 'ws://localhost:8989/ws',
+		serialPortDevice: '/dev/ttyUSB0',
 		aux1_label: 'AUX1',
 		aux2_label: 'AUX2',
 		coax1_label: 'COAX1',
@@ -177,7 +178,7 @@ var RotelClient = function() {
 	this.webSocket.timeoutInterval = 1000;
 	this.webSocket.maxReconnectInterval = 8000;
 	this.webSocket.onopen = function() {
-		self.webSocket.send('open /dev/ttyUSB0 115200');
+		self.webSocket.send('open '+config.serialPortDevice+' 115200');
 		self.initializeRotelState();
 	};
 
@@ -259,7 +260,6 @@ var RotelClient = function() {
 				if (responses) {
 					for (var i = 0; i < responses.length; i++)  {
 						console.log("responses[" + i + "]: "  + responses[i]);
-
 						if (self.remainingDisplayCharCount) {
 							console.log("remainingDisplayCharCount: " + self.remainingDisplayCharCount);
 							self.display2 = responses[i].substring(0, self.remainingDisplayCharCount);
