@@ -3,16 +3,16 @@ var RotelClient = function() {
 	var config = RotelConfig || {  //Adjust custom config in rotelConfig.js
 		websocketUrl : 'ws://localhost:8989/ws',
 		serialPortDevice: '/dev/ttyUSB0',
-		aux1_label: 'AUX1',
-		aux2_label: 'AUX2',
-		coax1_label: 'COAX1',
-		coax2_label: 'COAX2',
-		opt1_label: 'OPT1',
-		opt2_label: 'OPT2',
-		tuner_label: 'TUNER',
-		phono_label: 'PHONO',
-		cd_label: 'CD',
-		usb_label: 'USB'
+		aux1: 'AUX1',
+		aux2: 'AUX2',
+		coax1: 'COAX1',
+		coax2: 'COAX2',
+		opt1: 'OPT1',
+		opt2: 'OPT2',
+		tuner: 'TUNER',
+		phono: 'PHONO',
+		cd: 'CD',
+		usb: 'USB'
 	};
 
 	var self = this;
@@ -66,6 +66,10 @@ var RotelClient = function() {
 			var display = "" + this.display1 + this.display2;
 			$("#lcd-display").text((display.slice(0,21) + "\n" + display.slice(21)));
 		}
+		if (this.inputSource != null && this.volume != null) {
+			document.title = (config[this.inputSource] != null ? config[this.inputSource] : this.inputSource) + 
+				", Volume: " + this.volume;
+		}
 		this.attachEventHandlers();
 	}
 
@@ -80,16 +84,16 @@ var RotelClient = function() {
 		self.webSocket.send(self.getBalanceEvent());
 		self.webSocket.send(self.getDisplayEvent());
 
-		config.aux1_label ? $("#aux1").text(config.aux1_label) : $("#aux1").remove();
-		config.aux2_label ? $("#aux2").text(config.aux2_label) : $("#aux2").remove();
-		config.coax1_label ? $("#coax1").text(config.coax1_label) : $("#coax1").remove();
-		config.coax2_label ? $("#coax2").text(config.coax2_label) : $("#coax2").remove();
-		config.opt1_label ? $("#opt1").text(config.opt1_label) : $("#opt1").remove();
-		config.opt2_label ? $("#opt2").text(config.opt2_label) : $("#opt2").remove();
-		config.tuner_label ? $("#tuner").text(tuner.coax1_label) : $("#tuner").remove();
-		config.phono_label ? $("#phono").text(config.phono_label) : $("#phono").remove();
-		config.cd_label ? $("#cd").text(config.cd_label) : $("#cd").remove();
-		config.usb_label ? $("#usb").text(config.usb_label) : $("#usb").remove();
+		config.aux1 ? $("#aux1").text(config.aux1) : $("#aux1").attr("disabled","disabled");
+		config.aux2 ? $("#aux2").text(config.aux2) : $("#aux2").attr("disabled","disabled");
+		config.coax1 ? $("#coax1").text(config.coax1) : $("#coax1").attr("disabled","disabled");
+		config.coax2 ? $("#coax2").text(config.coax2) : $("#coax2").attr("disabled","disabled");
+		config.opt1 ? $("#opt1").text(config.opt1) : $("#opt1").attr("disabled","disabled");
+		config.opt2 ? $("#opt2").text(config.opt2) : $("#opt2").attr("disabled","disabled");
+		config.tuner ? $("#tuner").text(tuner.coax1) : $("#tuner").attr("disabled","disabled");
+		config.phono ? $("#phono").text(config.phono) : $("#phono").attr("disabled","disabled");
+		config.cd ? $("#cd").text(config.cd) : $("#cd").attr("disabled","disabled");
+		config.usb ? $("#usb").text(config.usb) : $("#usb").attr("disabled","disabled");
 	}
 
 	this.detachEventHandlers = function() {

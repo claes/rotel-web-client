@@ -1,0 +1,127 @@
+<html>
+<head>
+ <title>Rotel</title>
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script> 
+ <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css">
+ <script src="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js"></script> 
+ <script src="rotelConfig.js"></script> 
+ <script src="rotelClient.js"></script> 
+ <script src="reconnectingWebsocket.js"></script> 
+
+<style>
+input, label {
+    display: block;
+}
+.flipswitchrow
+{
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+.flipswitchcolumn
+{
+    display: table-cell;
+    padding-right: 10px;
+}
+.controlcontainer
+{
+    margin: 10px;
+}
+
+#lcd-display
+{
+    border: 2px solid;
+    padding: 6px;
+    margin-bottom: 10px;
+    font-family:monospace;
+    white-space:pre;
+    font-size: 150%;
+    text-align: center;
+}
+</style>
+
+</head>
+
+<body>
+<div data-role="page" id="home">
+<div class="controlcontainer">
+<div id="lcd-display" >
+</div>
+
+<fieldset id="test" class="flipswitchrow">
+
+<div class="flipswitchcolumn">
+<label for="power-flipswitch">Power:</label>
+<select id="power-flipswitch" data-role="flipswitch">
+<option value="standby">Off</option>
+<option value="on">On</option>
+</select>
+</div>
+
+<div class="flipswitchcolumn">
+<label for="tone-flipswitch">Tone:</label>
+<select id="tone-flipswitch" data-role="flipswitch">
+<option value="off">Off</option>
+<option value="on">On</option>
+</select>
+</div>
+
+<div class="flipswitchcolumn">
+<label for="mute-flipswitch">Mute:</label>
+<select id="mute-flipswitch" data-role="flipswitch">
+<option value="off">Off</option>
+<option value="on">On</option>
+</select>
+</div>
+
+</fieldset>
+
+<label>
+    <label for="volume-slider">Volume:</label>
+    <input name="volume-slider" id="volume-slider" data-highlight="true" min="0" max="95" value="10" type="range">
+</label> 
+
+
+<label for="source" class="select">Source:</label>
+<select name="source" id="source">
+<option id="aux1" value="aux1">AUX1</option>
+<option id="aux2" value="aux2">AUX2</option>
+<option id="coax1" value="coax1">COAX1</option>
+<option id="coax2" value="coax2">COAX2</option>
+<option id="opt1" value="opt1">OPT1</option>
+<option id="opt2" value="opt2">OPT2</option>
+<option id="tuner" value="tuner">TUNER</option>
+<option id="phono" value="phono">PHONO</option>
+<option id="cd" value="cd">CD</option>
+<option id="usb" value="usb">USB</option>
+</select></label> 
+
+
+<label>
+    <label for="treble-slider">Treble:</label>
+    <input name="treble-slider" id="treble-slider" data-highlight="true" min="-10" max="10" value="0" type="range">
+</label> 
+
+<label>
+    <label for="bass-slider">Bass:</label>
+    <input name="bass-slider" id="bass-slider" data-highlight="true" min="-10" max="10" value="0" type="range">
+</label> 
+
+<label>
+    <label for="balance-slider">Balance:</label>
+    <input name="balance-slider" id="balance-slider" data-highlight="true" min="-15" max="15" value="0" type="range">
+</label> 
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+	var rotelClient = new RotelClient();	
+});
+
+$(window).on('beforeunload', function() {rotelClient.discard();} );
+</script>
+</div>
+</body>
+</html>
+
+
