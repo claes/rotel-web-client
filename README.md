@@ -5,6 +5,9 @@ If you have a modern Rotel Hifi amplifier with a serial RS232 input, chances are
 
 I wrote this to use a Raspberry Pi (running Volumio) together with a USB-to-RS232 adapter to control my Rotel RA-12 amplifier.
 
+![Screenshot](screenshot.png)
+
+
 *Instructions*
 
 Connect the Rotel amplifier with a serial cable to a computer. Check what serial port device it creates (for example "/dev/ttyUSB0").
