@@ -1,5 +1,5 @@
-Rotel RS232 Websocket Remote
-============================
+Rotel Web Client 
+================
 
 If you have a modern Rotel Hifi amplifier with a serial RS232 input, chances are you can use this project to control it from your phone or any device with a modern web browser. 
 
@@ -27,7 +27,7 @@ The communication is bi-directional, so if you change the volume using the volum
 
 By adjusting the config properties in rotelConfig.js, you can name your music sources ("TV", "Chromecast" etc). Label properties set to null will be disabled.
 
-* Problems *
+*Problems* 
 
 The project is tested with Rotel RA-12. Not all Rotel equipment implements the same protocol. See http://www.rotel.com/manual-resources/rs232-protocols for protocol specifications for different models. 
 
