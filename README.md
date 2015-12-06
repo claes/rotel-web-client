@@ -20,7 +20,7 @@ And then access it from  http://my-address-here/rotel/index.html
 Adjust the rotelConfig.js file in this project and update the setting "websocketUrl" to refer to the address of the serial-port-json-server service. 
 You also want to adjust the setting "serialPortDevice" if it differs from the default '/dev/ttyUSB0'.
 
-Load rotelConfig.html in your web browser. The javascript loaded by this page will connect to the serial-port-json-server and through it communicate with the Rotel amplifier. Now you can control power, volume, source, balance and tone controls. 
+Load index.html in your web browser. The javascript loaded by this page will connect to the serial-port-json-server and through it communicate with the Rotel amplifier. Now you can control power, volume, source, balance and tone controls. 
 The communication is bi-directional, so if you change the volume using the volume knob on the amplifier or the regular remote, the web interface will reflect that.
 
 *Tips*
